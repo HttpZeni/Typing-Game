@@ -1,3 +1,5 @@
+import { quotes } from './quotes.js';
+
 let timer = 0; // Tracks how many seconds the user is typing
 let isTyping = true; // Flag to check if typing just started
 let pressed = false; // Prevents multiple counts per key press
@@ -5,28 +7,12 @@ let createdElems = false; // Check if the end elemts are created or not
 
 let mistake = 0; // Counts incorrect characters
 let right = 0;   // Counts correct characters
+let letters = 0;
 
 let result = undefined;
 let showTime = undefined;
 let showRight = undefined;
 let showMistakes = undefined;
-
-// Array of random quotes to type
-const quotes = [
-    "Keep calm and code on.",
-    "Bugs are just misunderstood features.",
-    "The cake is a lie.",
-    "Eat, sleep, code, repeat.",
-    "Coding is my cardio.",
-    "Trust me, I'm a developer.",
-    "To code or not to code.",
-    "I turn coffee into code.",
-    "Hello World, meet my keyboard.",
-    "I write code. What's your superpower?",
-    "First, solve the problem. Then, write the code.",
-    "Programs must be written for people to read.",
-    "It works on my machine."
-];
 
 // DOM elements
 const quoteElement = document.getElementById("quote");
@@ -42,6 +28,8 @@ function randomQuote(){
     console.log('Random quote');
     currentQuote = quotes[Math.floor(Math.random() * quotes.length)];
     quoteElement.innerHTML = "";
+
+    letters = currentQuote.length;
 
     for (let i = 0; i < currentQuote.length; i++){
         const span = document.createElement('span');
@@ -107,6 +95,11 @@ function updateTimer(){
 // Ends the typing session and shows results
 function end(){
     console.log('end');
+
+    right = right - mistake;
+    if(right < 0){
+        right = 0;
+    }
     
     if (!createdElems){
         console.log('Creating elements');
@@ -138,22 +131,22 @@ function end(){
     }
 
     if(mistake <= 1){
-        showMistakes.innerHTML = `You had <span style="color: green">${mistake}</span> mistake(s).`;
+        showMistakes.innerHTML = `You had <span style="color: green">${mistake}</span> mistake(s) out of ${letters} letters`;
     }
     else if(mistake > 1 && mistake <= 5){
-        showMistakes.innerHTML = `You had <span style="color: yellow">${mistake}</span> mistake(s).`;
+        showMistakes.innerHTML = `You had <span style="color: yellow">${mistake}</span> mistake(s) out of ${letters} letters`;
     }
     else{
-        showMistakes.innerHTML = `You had <span style="color: red">${mistake}</span> mistake(s).`;
+        showMistakes.innerHTML = `You had <span style="color: red">${mistake}</span> mistake(s) out of ${letters} letters`;
     }
     if (right <= currentQuote.length / 3) {
-        showRight.innerHTML = `You had <span style="color: red">${right}</span> right.`;
+        showRight.innerHTML = `You had <span style="color: red">${right}</span> right out of ${letters} letters`;
     } 
-    else if (right > currentQuote.length / 3 && right <= currentQuote.length / 1.5) {
-        showRight.innerHTML = `You had <span style="color: yellow">${right}</span> right.`;
+    else if (right > currentQuote.length / 1.5 && right <= currentQuote.length / 3) {
+        showRight.innerHTML = `You had <span style="color: yellow">${right}</span> right out of ${letters} letters`;
     } 
     else {
-        showRight.innerHTML = `You had <span style="color: green">${right}</span> right.`;
+        showRight.innerHTML = `You had <span style="color: green">${right}</span> right out of ${letters} letters`;
     }
 
     randomQuote();
