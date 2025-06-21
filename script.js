@@ -130,14 +130,27 @@ function end(){
         showTime.innerHTML = `You took <span style="color: red">${timer}</span> seconds.`;
     }
 
-    if(mistake <= 1){
-        showMistakes.innerHTML = `You had <span style="color: green">${mistake}</span> mistake(s) out of ${letters} letters`;
-    }
-    else if(mistake > 1 && mistake <= 5){
-        showMistakes.innerHTML = `You had <span style="color: yellow">${mistake}</span> mistake(s) out of ${letters} letters`;
+    if(mistake === 1 || mistake == 0){
+        if(mistake <= 1){
+            showMistakes.innerHTML = `You had <span style="color: green">${mistake}</span> mistake out of ${letters} letters`;
+        }
+        else if(mistake > 1 && mistake <= 5){
+            showMistakes.innerHTML = `You had <span style="color: yellow">${mistake}</span> mistake out of ${letters} letters`;
+        }
+        else{
+            showMistakes.innerHTML = `You had <span style="color: red">${mistake}</span> mistake out of ${letters} letters`;
+        } 
     }
     else{
-        showMistakes.innerHTML = `You had <span style="color: red">${mistake}</span> mistake(s) out of ${letters} letters`;
+        if(mistake <= 1){
+            showMistakes.innerHTML = `You had <span style="color: green">${mistake}</span> mistake(s) out of ${letters} letters`;
+        }
+        else if(mistake > 1 && mistake <= 5){
+            showMistakes.innerHTML = `You had <span style="color: yellow">${mistake}</span> mistake(s) out of ${letters} letters`;
+        }
+        else{
+            showMistakes.innerHTML = `You had <span style="color: red">${mistake}</span> mistake(s) out of ${letters} letters`;
+        } 
     }
     if (right <= currentQuote.length / 3) {
         showRight.innerHTML = `You had <span style="color: red">${right}</span> right out of ${letters} letters`;
