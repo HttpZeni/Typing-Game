@@ -3,7 +3,6 @@ import { scores } from './Scores.js';
 
 let timer = 0;
 let isTyping = true;
-let pressed = false;
 let createdElems = false;
 let mistake = 0;
 let right = 0; 
@@ -13,6 +12,7 @@ let showTime = undefined;
 let showRight = undefined;
 let showMistakes = undefined;
 let showedScores = false;
+let timerId = null;
 let mistakeMap = [];
 
 const quoteElement = document.getElementById("quote");
@@ -41,6 +41,10 @@ function randomQuote(){
     mistakeMap = new Array(currentQuote.length).fill(false);
     letters = currentQuote.length;
 
+    clearInterval(timerId);
+    timerId = null; 
+    timer = 0;
+
     for (let i = 0; i < currentQuote.length; i++){
         const span = document.createElement('span');
         span.textContent = currentQuote[i];
@@ -49,6 +53,7 @@ function randomQuote(){
     }
 
     inputElement.value = "";
+    inputElement.focus();
 }
 
 function loadScores() {
@@ -66,6 +71,7 @@ function loadScores() {
             <p>Best mistakes percentage: ${scores["best-mistakes"]}%</p>
             <p>Longest time: ${scores["longest-time"]} seconds</p>
             <p>Shortest time: ${scores["shortest-time"]} seconds</p>
+            <button id="resetScores">Reset</button>
         `;
     } else {
         scoreDisplay.innerHTML = "<p>No scores saved yet!</p>";
@@ -73,11 +79,30 @@ function loadScores() {
     if (!showedScores) {
         scoreDisplay.classList.add('show');
         container.style.filter = "blur(5px)";
+        const resetBtn = document.createElement('button');
+        resetBtn.id = 'resetScores';
+        document.getElementById('resetScores').addEventListener('click', () => resetScore());
     } else {
         scoreDisplay.classList.remove('show');
         container.style.filter = "blur(0px)";
     }
     showedScores = !showedScores;
+}
+
+function resetScore(){
+    console.log("Setting back to default");
+
+    scores['most-right'] = 0;
+    scores['least-right'] = Infinity;
+    scores['best-right'] = 0;
+    scores['most-mistakes'] = 0;
+    scores['least-mistakes'] = Infinity;
+    scores['best-mistakes'] = Infinity;
+    scores['longest-time'] = 0;
+    scores['shortest-time'] = Infinity;
+
+    localStorage.setItem('scores', JSON.stringify(scores));
+    loadScores();
 }
 
 document.getElementById('Scores').addEventListener('click', () => loadScores());
@@ -123,13 +148,9 @@ document.addEventListener('input', () => {
     }
 });
 
-document.addEventListener('keyup', () => {
-    pressed = false;
-})
-
 function start(){
     if(isTyping){
-        setInterval(updateTimer, 1000);
+        timerId = setInterval(updateTimer, 1000);
         isTyping = false;
     }
 }
@@ -188,9 +209,11 @@ function updateScores() {
 }
 
 function end(){
+    clearInterval(timerId);
+    timerId = null; 
+
     let isItGood = 0;
 
-    right = right - mistake;
     if(right < 0){
         right = 0;
     }

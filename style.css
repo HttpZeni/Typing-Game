@@ -101,6 +101,7 @@ textarea:focus{
     width: 400px;
     height: 455px;
     padding: 1em;
+    padding-top: 2em;
     background-color: #222222cb;
     color: #eeeeee;
     font-size: 25px;
@@ -154,4 +155,30 @@ textarea:focus{
 #feedback{
     font-size: 1.5rem;
     margin-top: -1.4em;
+}
+
+#resetScores{
+    position: absolute;
+    width: 100px;
+    height: 40px;
+    margin-top: -31.1em;
+    margin-left: 19.7em;
+    border-radius: 8px;
+    background-color: #222;
+    color: #eeeeee7e;
+    font-size: 16px;
+    border: 1px solid #444;
+    outline: none;
+    transition: transform 0.25s ease, box-shadow 0.15s ease, color 0.25s ease;
+}
+#resetScores:hover{
+    transform: scale(1.05);
+    border: 2px solid #444;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.658);
+    color: #eeeeeec0;
+}
+#resetScores:active{
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.76);
+    color: #eee;
 }
