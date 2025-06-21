@@ -212,6 +212,8 @@ function end(){
     clearInterval(timerId);
     timerId = null; 
 
+    right = right - mistake;
+
     let isItGood = 0;
 
     if(right < 0){
