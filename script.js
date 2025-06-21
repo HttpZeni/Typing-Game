@@ -187,7 +187,6 @@ function updateScores() {
     localStorage.setItem('scores', JSON.stringify(scores));
 }
 
-
 function end(){
     let isItGood = 0;
 
