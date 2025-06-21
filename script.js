@@ -1,34 +1,44 @@
 import { quotes } from './quotes.js';
+import { scores } from './Scores.js';
 
-let timer = 0; // Tracks how many seconds the user is typing
-let isTyping = true; // Flag to check if typing just started
-let pressed = false; // Prevents multiple counts per key press
-let createdElems = false; // Check if the end elemts are created or not
-
-let mistake = 0; // Counts incorrect characters
-let right = 0;   // Counts correct characters
+let timer = 0;
+let isTyping = true;
+let pressed = false;
+let createdElems = false;
+let mistake = 0;
+let right = 0; 
 let letters = 0;
-
 let result = undefined;
 let showTime = undefined;
 let showRight = undefined;
 let showMistakes = undefined;
+let showedScores = false;
+let mistakeMap = [];
 
-// DOM elements
 const quoteElement = document.getElementById("quote");
 const inputElement = document.getElementById("input");
-const resultElement = document.getElementById("result");
+const scoreDisplay = document.getElementById('scoreDisplay');
+const feedbackText = document.getElementById('feedback');
+let currentQuote;
 
-let currentQuote; // The current quote being typed
+const savedScores = localStorage.getItem('scores');
+if (savedScores) {
+    Object.assign(scores, JSON.parse(savedScores));
+}
 
-randomQuote(); // Initialize with a random quote
+document.addEventListener('DOMContentLoaded', () => {
 
-// Picks a random quote and shows it
+    inputElement.value = "";
+})
+
+randomQuote();
+
 function randomQuote(){
     console.log('Random quote');
     currentQuote = quotes[Math.floor(Math.random() * quotes.length)];
     quoteElement.innerHTML = "";
 
+    mistakeMap = new Array(currentQuote.length).fill(false);
     letters = currentQuote.length;
 
     for (let i = 0; i < currentQuote.length; i++){
@@ -37,9 +47,42 @@ function randomQuote(){
         span.classList.add("pending");
         quoteElement.appendChild(span);
     }
+
+    inputElement.value = "";
 }
 
-// Starts everything when a new input is detected
+function loadScores() {
+    const savedScores = localStorage.getItem('scores');
+    const container = document.querySelector('.container');
+
+    if (savedScores) {
+        const scores = JSON.parse(savedScores);
+        scoreDisplay.innerHTML = `
+            <p>Most right: ${scores["most-right"]}</p>
+            <p>Least right: ${scores["least-right"]}</p>
+            <p>Best right percentage: ${scores["best-right"]}%</p>
+            <p>Most mistakes: ${scores["most-mistakes"]}</p>
+            <p>Least mistakes: ${scores["least-mistakes"]}</p>
+            <p>Best mistakes percentage: ${scores["best-mistakes"]}%</p>
+            <p>Longest time: ${scores["longest-time"]} seconds</p>
+            <p>Shortest time: ${scores["shortest-time"]} seconds</p>
+        `;
+    } else {
+        scoreDisplay.innerHTML = "<p>No scores saved yet!</p>";
+    }
+    if (!showedScores) {
+        scoreDisplay.classList.add('show');
+        container.style.filter = "blur(5px)";
+    } else {
+        scoreDisplay.classList.remove('show');
+        container.style.filter = "blur(0px)";
+    }
+    showedScores = !showedScores;
+}
+
+document.getElementById('Scores').addEventListener('click', () => loadScores());
+document.getElementById('newQuote').addEventListener('click', () => randomQuote());
+
 document.addEventListener('input', () => {
     start();
 
@@ -53,18 +96,24 @@ document.addEventListener('input', () => {
         const span = quoteSpans[i];
 
         if (letter == null){
-            console.log(`Index ${i}: fehlender Buchstabe`);
             span.className = 'normal';
+            mistakeMap[i] = false;
         }
         else if (letter === currentQuote[i]){
-            console.log(`Index ${i}: richtig`);
+            if (mistakeMap[i]){
+                mistake -= 1;
+                mistakeMap[i] = false;
+            }
             span.className = "correct";
             right += 1;
+            mistakeMap[i] = false;
         }
         else {
-            console.log(`Index ${i}: falsch (letter: ${letter}, expected: ${currentQuote[i]})`);
             span.className = "wrong";
-            mistake += 1;
+            if (!mistakeMap[i]){
+                mistake += 1;
+                mistakeMap[i] = true;
+            }
         }
     }
     console.log(`Right: ${right}, Mistake: ${mistake}`);
@@ -74,31 +123,80 @@ document.addEventListener('input', () => {
     }
 });
 
-// Reset "pressed" flag when key is released
 document.addEventListener('keyup', () => {
     pressed = false;
 })
 
-// Starts the timer once when typing begins
 function start(){
     if(isTyping){
-        setInterval(updateTimer, 1000); // Call updateTimer every second
+        setInterval(updateTimer, 1000);
         isTyping = false;
     }
 }
 
-// Increments the timer by 1 every second
 function updateTimer(){
     timer += 1;
 }
 
-// Ends the typing session and shows results
+function updateScores() {
+    if (scores['most-right'] === undefined) scores['most-right'] = 0;
+    if (scores['least-right'] === undefined) scores['least-right'] = Infinity;
+    if (scores['best-right'] === undefined) scores['best-right'] = 0;
+    if (scores['most-mistakes'] === undefined) scores['most-mistakes'] = 0;
+    if (scores['least-mistakes'] === undefined) scores['least-mistakes'] = Infinity;
+    if (scores['best-mistakes'] === undefined) scores['best-mistakes'] = Infinity;
+    if (scores['longest-time'] === undefined) scores['longest-time'] = 0;
+    if (scores['shortest-time'] === undefined) scores['shortest-time'] = Infinity;
+
+    if (right > scores['most-right']) {
+        scores['most-right'] = right;
+    }
+    if (right < scores['least-right']) {
+        scores['least-right'] = right;
+    }
+
+    const correctLetters = letters - mistake;
+    const currentRightRatio = correctLetters / letters;
+    const roundedRightRatio = Math.round(currentRightRatio * 100);
+
+    if (roundedRightRatio > scores['best-right']) {
+        scores['best-right'] = roundedRightRatio;
+    }
+
+    if (mistake > scores['most-mistakes']) {
+        scores['most-mistakes'] = mistake;
+    }
+    if (mistake < scores['least-mistakes']) {
+        scores['least-mistakes'] = mistake;
+    }
+
+    const currentMistakeRatio = mistake / letters;
+    const roundedMistakeRatio = Math.round(currentMistakeRatio * 100);
+
+    if (roundedMistakeRatio < scores['best-mistakes']) {
+        scores['best-mistakes'] = roundedMistakeRatio;
+    }
+
+    if (timer > scores['longest-time']) {
+        scores['longest-time'] = timer;
+    }
+    if (timer < scores['shortest-time']) {
+        scores['shortest-time'] = timer;
+    }
+
+    localStorage.setItem('scores', JSON.stringify(scores));
+}
+
+
 function end(){
-    console.log('end');
+    let isItGood = 0;
 
     right = right - mistake;
     if(right < 0){
         right = 0;
+    }
+    if (mistake > letters){
+        mistake = letters;
     }
     
     if (!createdElems){
@@ -122,48 +220,74 @@ function end(){
 
     if (timer < 10){
         showTime.innerHTML = `You took <span style="color: green">${timer}</span> seconds.`;
+        isItGood += 3;
     }
     else if (timer >= 10 && timer < 15){
         showTime.innerHTML = `You took <span style="color: yellow">${timer}</span> seconds.`;
+        isItGood += 2;
     }
     else{
         showTime.innerHTML = `You took <span style="color: red">${timer}</span> seconds.`;
+        isItGood++;
     }
 
-    if(mistake === 1 || mistake == 0){
+    if(mistake === 1){
         if(mistake <= 1){
             showMistakes.innerHTML = `You had <span style="color: green">${mistake}</span> mistake out of ${letters} letters`;
+            isItGood += 3;
         }
         else if(mistake > 1 && mistake <= 5){
             showMistakes.innerHTML = `You had <span style="color: yellow">${mistake}</span> mistake out of ${letters} letters`;
+            isItGood += 2;
         }
         else{
             showMistakes.innerHTML = `You had <span style="color: red">${mistake}</span> mistake out of ${letters} letters`;
+            isItGood++;
         } 
     }
     else{
         if(mistake <= 1){
-            showMistakes.innerHTML = `You had <span style="color: green">${mistake}</span> mistake(s) out of ${letters} letters`;
+            showMistakes.innerHTML = `You had <span style="color: green">${mistake}</span> mistakes out of ${letters} letters`;
+            isItGood += 3;
         }
         else if(mistake > 1 && mistake <= 5){
-            showMistakes.innerHTML = `You had <span style="color: yellow">${mistake}</span> mistake(s) out of ${letters} letters`;
+            showMistakes.innerHTML = `You had <span style="color: yellow">${mistake}</span> mistakes out of ${letters} letters`;
+            isItGood += 2;
         }
         else{
-            showMistakes.innerHTML = `You had <span style="color: red">${mistake}</span> mistake(s) out of ${letters} letters`;
+            showMistakes.innerHTML = `You had <span style="color: red">${mistake}</span> mistakes out of ${letters} letters`;
+            isItGood++;
         } 
     }
     if (right <= currentQuote.length / 3) {
         showRight.innerHTML = `You had <span style="color: red">${right}</span> right out of ${letters} letters`;
+        isItGood++;
     } 
     else if (right > currentQuote.length / 1.5 && right <= currentQuote.length / 3) {
         showRight.innerHTML = `You had <span style="color: yellow">${right}</span> right out of ${letters} letters`;
+        isItGood += 2;
     } 
     else {
         showRight.innerHTML = `You had <span style="color: green">${right}</span> right out of ${letters} letters`;
+        isItGood += 3;
+    }
+
+    if(isItGood === 3){
+        feedbackText.innerHTML = `<span style="color: red">That was trash ngl.</span>`;
+    }
+    else if(isItGood > 3 && isItGood < 6){
+        feedbackText.innerHTML = `<span style="color: orange">Not bad, but still trash.</span>`;
+    }
+    else if(isItGood >= 6 && isItGood < 9){
+        feedbackText.innerHTML = `<span style="color: yellow">Okay, it's alright.</span>`;
+    }
+    else if(isItGood === 9){
+        feedbackText.innerHTML = `<span style="color: green">Yayyy, you got it.</span>`;
     }
 
     randomQuote();
-    inputElement.value = "";
+
+    updateScores();
 
     timer = 0;
     isTyping = true;
