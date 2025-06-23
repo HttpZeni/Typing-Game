@@ -1,29 +1,32 @@
-export const quotes = [
-  'The sky isn\'t the limit. It\'s just the beginning.',
-  'Life is like riding a bicycle. To keep your balance, you must keep moving.',
-  'Dreams don\'t work unless you do.',
-  'You don\'t find the light by avoiding the darkness.',
-  'Stay curious, stay weird, stay wonderful.',
-  'Coffee first. Schemes later.',
-  'Sometimes the bravest thing you can do is get out of bed.',
-  'The universe is under no obligation to make sense to you.',
-  'Don\'t grow up. It\'s a trap.',
-  'Zeni is somewhere coding and probably overthinking semicolons.',
-  'Be the plot twist you wish to see in your story.',
-  'Some days you tame the dragon. Some days the dragon eats you.',
-  'Make it messy, then make it magic.',
-  'You are the glitch in the simulation. Embrace it.',
-  'Chaos is just another form of art.',
-  'Reality is overrated. Code something better.',
-  'If it scares you, it might be worth doing.',
-  'Typing fast doesn\'t mean thinking fast.',
-  'You were born to stand out, not fit in.',
-  'No bugs. Just unexpected features.',
-  'Take breaks. Even heroes need naps.',
-  'You miss 100% of the typos you don\'t catch.',
-  'Never trust a smiling compiler.',
-  'Silence is golden. Unless you forgot a `console.log`.',
-  'Every line of code is a tiny rebellion.',
-  'You survived yesterday. You can wreck today.',
-  'Legends aren\'t born. They hit backspace and try again.'
-];
+export const quotes = {
+  easy: [
+    "Practice makes perfect",
+    "Never give up",
+    "Keep going forward",
+    "You can do it",
+    "Believe in yourself",
+    "Trust the process",
+    "Hard work pays off",
+    "Stay strong",
+    "Make it happen",
+    "Just keep typing"
+  ],
+  medium: [
+    "Success comes to those who work hard",
+    "Dreams do not work unless you do",
+    "Every day is a chance to improve",
+    "You become better by being consistent",
+    "Growth starts outside your comfort zone",
+    "Winners never quit and quitters never win",
+    "Typing fast starts with typing right"
+  ],
+  hard: [
+    "The greatest glory in living lies not in never falling but in rising every time we fall",
+    "Typing is not about rushing but about rhythm focus and calm under pressure",
+    "To master typing you must train both fingers and brain with endless repetition",
+    "Improvement comes with mistakes embrace them and learn with patience and grit",
+    "Fast and flawless typing flows from focus familiarity and fearless fingers",
+    "Challenge your limits and your limits will become your strengths over time",
+    "Discipline beats motivation consistency crushes chaos progress loves repetition"
+  ]
+}

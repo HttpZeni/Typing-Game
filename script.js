@@ -1,4 +1,5 @@
 import { quotes } from './quotes.js';
+import { words } from './words.js'
 import { scores } from './Scores.js';
 
 let timer = 0;
@@ -13,12 +14,19 @@ let showRight = undefined;
 let showMistakes = undefined;
 let showedScores = false;
 let timerId = null;
+let isQuoteChoosed = true;
+let difficullty = 'easy';
 let mistakeMap = [];
 
 const quoteElement = document.getElementById("quote");
 const inputElement = document.getElementById("input");
 const scoreDisplay = document.getElementById('scoreDisplay');
 const feedbackText = document.getElementById('feedback');
+const quotesBtn = document.getElementById('choseQuotes');
+const wordsBtn = document.getElementById('choseWords');
+const easyBtn = document.getElementById('easy');
+const mediumBtn = document.getElementById('medium');
+const hardBtn = document.getElementById('hard');
 let currentQuote;
 
 const savedScores = localStorage.getItem('scores');
@@ -34,9 +42,15 @@ document.addEventListener('DOMContentLoaded', () => {
 randomQuote();
 
 function randomQuote(){
-    console.log('Random quote');
-    currentQuote = quotes[Math.floor(Math.random() * quotes.length)];
     quoteElement.innerHTML = "";
+    
+    if (isQuoteChoosed){
+        const pool = quotes[difficullty];
+        currentQuote = pool[Math.floor(Math.random() * pool.length)];
+    } else {
+        const pool = words[difficullty];
+        currentQuote = pool[Math.floor(Math.random() * pool.length)];
+    }
 
     mistakeMap = new Array(currentQuote.length).fill(false);
     letters = currentQuote.length;
@@ -56,6 +70,101 @@ function randomQuote(){
     inputElement.focus();
 }
 
+quotesBtn.addEventListener('click', () => {
+    if (isQuoteChoosed){
+        isQuoteChoosed = false;
+        quotesBtn.style.backgroundColor = '#222';
+        quotesBtn.style.color = '#eeeeee7e';
+        quotesBtn.style.border = '1px solid #444';
+
+        wordsBtn.style.backgroundColor = '#888';
+        wordsBtn.style.color = '#000000bb';
+        wordsBtn.style.border = '1px solid #222';
+    }
+    else {
+        isQuoteChoosed = true;
+        quotesBtn.style.backgroundColor = '#888';
+        quotesBtn.style.color = '#000000bb';
+        quotesBtn.style.border = '1px solid #222';
+
+        wordsBtn.style.backgroundColor = '#222';
+        wordsBtn.style.color = '#eeeeee7e';
+        wordsBtn.style.border = '1px solid #444';
+    }
+    randomQuote()
+})
+wordsBtn.addEventListener('click', () => {
+    if (isQuoteChoosed){
+        isQuoteChoosed = false;
+        quotesBtn.style.backgroundColor = '#222';
+        quotesBtn.style.color = '#eeeeee7e';
+        quotesBtn.style.border = '1px solid #444';
+
+        wordsBtn.style.backgroundColor = '#888';
+        wordsBtn.style.color = '#000000bb';
+        wordsBtn.style.border = '1px solid #222';
+    }
+    else {
+        isQuoteChoosed = true;
+        quotesBtn.style.backgroundColor = '#888';
+        quotesBtn.style.color = '#000000bb';
+        quotesBtn.style.border = '1px solid #222';
+
+        wordsBtn.style.backgroundColor = '#222';
+        wordsBtn.style.color = '#eeeeee7e';
+        wordsBtn.style.border = '1px solid #444';
+    }
+    randomQuote()
+})
+
+easyBtn.addEventListener('click', () => {
+    difficullty = 'easy';
+
+    easyBtn.style.backgroundColor = '#888';
+    easyBtn.style.color = '#000000bb';
+    easyBtn.style.border = '1px solid #222';
+
+    mediumBtn.style.backgroundColor = '#222';
+    mediumBtn.style.color = '#eeeeee7e';
+    mediumBtn.style.border = '1px solid #444';
+
+    hardBtn.style.backgroundColor = '#222';
+    hardBtn.style.color = '#eeeeee7e';
+    hardBtn.style.border = '1px solid #444';
+    randomQuote()
+})
+mediumBtn.addEventListener('click', () => {
+    difficullty = 'medium';
+
+    easyBtn.style.backgroundColor = '#222';
+    easyBtn.style.color = '#eeeeee7e';
+    easyBtn.style.border = '1px solid #444';
+
+    mediumBtn.style.backgroundColor = '#888';
+    mediumBtn.style.color = '#000000bb';
+    mediumBtn.style.border = '1px solid #222';
+
+    hardBtn.style.backgroundColor = '#222';
+    hardBtn.style.color = '#eeeeee7e';
+    hardBtn.style.border = '1px solid #444';
+    randomQuote()
+})
+hardBtn.addEventListener('click', () => {
+    difficullty = 'hard';
+
+    easyBtn.style.backgroundColor = '#222';
+    easyBtn.style.color = '#eeeeee7e';
+    easyBtn.style.border = '1px solid #444';
+
+    mediumBtn.style.backgroundColor = '#222';
+    mediumBtn.style.color = '#eeeeee7e';
+    mediumBtn.style.border = '1px solid #444';
+
+    hardBtn.style.backgroundColor = '#888';
+    hardBtn.style.color = '#000000bb';
+    hardBtn.style.border = '1px solid #222';
+    randomQuote()
+})
 function loadScores() {
     const savedScores = localStorage.getItem('scores');
     const container = document.querySelector('.container');
