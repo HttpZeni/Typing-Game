@@ -18,7 +18,7 @@ This is a simple typing trainer implemented in JavaScript. It displays random qu
 3. Start typing in the input field; the timer will start automatically.
 4. Upon correctly typing the entire quote, results will be displayed.
 5. A new quote will be loaded and the input reset for the next round.
-6. Or test the it on [this website](https://httpzeni.github.io/Typing-Game/)
+6. Or test it on [this website](https://httpzeni.github.io/Typing-Game/)
 
 ## Required HTML structure
 
