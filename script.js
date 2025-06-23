@@ -58,6 +58,8 @@ function randomQuote(){
     clearInterval(timerId);
     timerId = null; 
     timer = 0;
+    mistake = 0;
+    right = 0;
 
     for (let i = 0; i < currentQuote.length; i++){
         const span = document.createElement('span');
@@ -165,6 +167,7 @@ hardBtn.addEventListener('click', () => {
     hardBtn.style.border = '1px solid #222';
     randomQuote()
 })
+
 function loadScores() {
     const savedScores = localStorage.getItem('scores');
     const container = document.querySelector('.container');
@@ -208,7 +211,7 @@ function resetScore(){
     scores['least-mistakes'] = Infinity;
     scores['best-mistakes'] = Infinity;
     scores['longest-time'] = 0;
-    scores['shortest-time'] = Infinity;
+    scores['shortest-time'] = Number.POSITIVE_INFINITY;
 
     localStorage.setItem('scores', JSON.stringify(scores));
     loadScores();
@@ -318,6 +321,8 @@ function updateScores() {
 }
 
 function end(){
+    updateScores();
+
     clearInterval(timerId);
     timerId = null; 
 
@@ -419,8 +424,6 @@ function end(){
     }
 
     randomQuote();
-
-    updateScores();
 
     timer = 0;
     isTyping = true;
