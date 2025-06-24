@@ -6,5 +6,6 @@ export let scores = {
     "least-mistakes": Infinity,
     "best-mistakes": Infinity,
     "longest-time": 0,
-    "shortest-time": Number.POSITIVE_INFINITY,
+    "shortest-time": 1000,
+    "high-score": 0,
 }

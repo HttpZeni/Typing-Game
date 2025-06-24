@@ -15,7 +15,7 @@ let showMistakes = undefined;
 let showedScores = false;
 let timerId = null;
 let isQuoteChoosed = true;
-let difficullty = 'easy';
+let difficullty = 'medium';
 let mistakeMap = [];
 
 const quoteElement = document.getElementById("quote");
@@ -183,6 +183,7 @@ function loadScores() {
             <p>Best mistakes percentage: ${scores["best-mistakes"]}%</p>
             <p>Longest time: ${scores["longest-time"]} seconds</p>
             <p>Shortest time: ${scores["shortest-time"]} seconds</p>
+            <p>Best points: ${scores["high-score"]} points</p>
             <button id="resetScores">Reset</button>
         `;
     } else {
@@ -212,6 +213,7 @@ function resetScore(){
     scores['best-mistakes'] = Infinity;
     scores['longest-time'] = 0;
     scores['shortest-time'] = Number.POSITIVE_INFINITY;
+    scores['high-score'] = 0;
 
     localStorage.setItem('scores', JSON.stringify(scores));
     loadScores();
@@ -225,6 +227,7 @@ document.addEventListener('input', () => {
 
     const quoteSpans = quoteElement.querySelectorAll('span');
     const userInput = inputElement.value;
+    const currentIndex = userInput.length;
 
     right = 0;
 
@@ -232,8 +235,13 @@ document.addEventListener('input', () => {
         const letter = userInput[i];
         const span = quoteSpans[i];
 
+        if (i === currentIndex) {
+            quoteSpans[i].style.fontSize = "32px";
+            quoteSpans[i].style.opacity = "100%";
+        }
+
         if (letter == null){
-            span.className = 'normal';
+            span.className = "normal";
             mistakeMap[i] = false;
         }
         else if (letter === currentQuote[i]){
@@ -244,16 +252,26 @@ document.addEventListener('input', () => {
             span.className = "correct";
             right += 1;
             mistakeMap[i] = false;
+            quoteSpans[i].style.fontSize = "22px";
+
+            if (i > 2) {
+                quoteSpans[i - 2].style.opacity = "5%";
+                quoteSpans[i - 1].style.opacity = "25%";
+            }
+            if(i == 2){
+                quoteSpans[i - 2].style.opacity = "5%";
+            }
         }
         else {
+            quoteSpans[i].style.fontSize = "22px";
             span.className = "wrong";
+            span.style.opacity = "100%";
             if (!mistakeMap[i]){
                 mistake += 1;
                 mistakeMap[i] = true;
             }
         }
     }
-    console.log(`Right: ${right}, Mistake: ${mistake}`);
 
     if(userInput === currentQuote){
         end();
@@ -272,6 +290,8 @@ function updateTimer(){
 }
 
 function updateScores() {
+    let points = calculateScore();
+    let highestTime = Infinity;
     if (scores['most-right'] === undefined) scores['most-right'] = 0;
     if (scores['least-right'] === undefined) scores['least-right'] = Infinity;
     if (scores['best-right'] === undefined) scores['best-right'] = 0;
@@ -280,6 +300,7 @@ function updateScores() {
     if (scores['best-mistakes'] === undefined) scores['best-mistakes'] = Infinity;
     if (scores['longest-time'] === undefined) scores['longest-time'] = 0;
     if (scores['shortest-time'] === undefined) scores['shortest-time'] = Infinity;
+    if (scores['high-score'] === undefined) scores['high-score'] = 0;
 
     if (right > scores['most-right']) {
         scores['most-right'] = right;
@@ -313,30 +334,34 @@ function updateScores() {
     if (timer > scores['longest-time']) {
         scores['longest-time'] = timer;
     }
-    if (timer < scores['shortest-time']) {
+    if (timer < highestTime) {
         scores['shortest-time'] = timer;
+        highestTime = timer;
+    }
+
+    if(points > scores['high-score']){
+        scores['high-score'] = points;
     }
 
     localStorage.setItem('scores', JSON.stringify(scores));
 }
 
-function end(){
-    updateScores();
-
-    clearInterval(timerId);
-    timerId = null; 
-
-    right = right - mistake;
-
-    let isItGood = 0;
-
-    if(right < 0){
-        right = 0;
+function calculateScore() {
+    let points = 0;
+    if (letters > 0) points += timer / letters;
+    if (mistake > 0) points += timer / mistake;
+    if (right > 0) {
+        points += timer / right;
+        points += mistake / right;
     }
-    if (mistake > letters){
-        mistake = letters;
+    if (Math.round(points) === 0){
+        points = 100;
     }
-    
+
+    return Math.round(points) * 100;;
+}
+
+function showFeedback(){
     if (!createdElems){
         console.log('Creating elements');
         result = document.getElementById('result');
@@ -356,78 +381,79 @@ function end(){
         createdElems = true;
     }
 
+    feedbackText.classList.add('feedbackText');
+
     if (timer < 10){
         showTime.innerHTML = `You took <span style="color: green">${timer}</span> seconds.`;
-        isItGood += 3;
     }
     else if (timer >= 10 && timer < 15){
         showTime.innerHTML = `You took <span style="color: yellow">${timer}</span> seconds.`;
-        isItGood += 2;
     }
     else{
         showTime.innerHTML = `You took <span style="color: red">${timer}</span> seconds.`;
-        isItGood++;
     }
 
-    if(mistake === 1){
+    let misakeWord;
+
+    if(mistake === 1 ? misakeWord = "mistake" : misakeWord = "mistakes"){
         if(mistake <= 1){
-            showMistakes.innerHTML = `You had <span style="color: green">${mistake}</span> mistake out of ${letters} letters`;
-            isItGood += 3;
+            showMistakes.innerHTML = `You had <span style="color: green">${mistake}</span> ${misakeWord} out of ${letters} letters`;
         }
         else if(mistake > 1 && mistake <= 5){
-            showMistakes.innerHTML = `You had <span style="color: yellow">${mistake}</span> mistake out of ${letters} letters`;
-            isItGood += 2;
+            showMistakes.innerHTML = `You had <span style="color: yellow">${mistake}</span> ${misakeWord} out of ${letters} letters`;
         }
         else{
-            showMistakes.innerHTML = `You had <span style="color: red">${mistake}</span> mistake out of ${letters} letters`;
-            isItGood++;
-        } 
-    }
-    else{
-        if(mistake <= 1){
-            showMistakes.innerHTML = `You had <span style="color: green">${mistake}</span> mistakes out of ${letters} letters`;
-            isItGood += 3;
-        }
-        else if(mistake > 1 && mistake <= 5){
-            showMistakes.innerHTML = `You had <span style="color: yellow">${mistake}</span> mistakes out of ${letters} letters`;
-            isItGood += 2;
-        }
-        else{
-            showMistakes.innerHTML = `You had <span style="color: red">${mistake}</span> mistakes out of ${letters} letters`;
-            isItGood++;
+            showMistakes.innerHTML = `You had <span style="color: red">${mistake}</span> ${misakeWord} out of ${letters} letters`;
         } 
     }
     if (right <= currentQuote.length / 3) {
         showRight.innerHTML = `You had <span style="color: red">${right}</span> right out of ${letters} letters`;
-        isItGood++;
     } 
     else if (right > currentQuote.length / 1.5 && right <= currentQuote.length / 3) {
         showRight.innerHTML = `You had <span style="color: yellow">${right}</span> right out of ${letters} letters`;
-        isItGood += 2;
     } 
     else {
         showRight.innerHTML = `You had <span style="color: green">${right}</span> right out of ${letters} letters`;
-        isItGood += 3;
     }
 
-    if(isItGood === 3){
-        feedbackText.innerHTML = `<span style="color: red">That was trash ngl.</span>`;
-    }
-    else if(isItGood > 3 && isItGood < 6){
-        feedbackText.innerHTML = `<span style="color: orange">Not bad, but still trash.</span>`;
-    }
-    else if(isItGood >= 6 && isItGood < 9){
-        feedbackText.innerHTML = `<span style="color: yellow">Okay, it's alright.</span>`;
-    }
-    else if(isItGood === 9){
-        feedbackText.innerHTML = `<span style="color: green">Yayyy, you got it.</span>`;
-    }
+    let points = calculateScore();
 
+    console.log(points)
+
+    if(points <= 300){
+        feedbackText.innerHTML = `<span style="color: red">That was trash ngl. You had ${points} points</span>`;
+    }
+    else if(points > 300 && points < 600){
+        feedbackText.innerHTML = `<span style="color: orange">Not bad, but still trash. You had ${points} points</span>`;
+    }
+    else if(points >= 600 && points < 900){
+        feedbackText.innerHTML = `<span style="color: yellow">Okay, it's alright. You had ${points} points</span>`;
+    }
+    else if(points >= 900){
+        feedbackText.innerHTML = `<span style="color: green">Yayyy, you got it. You had ${points} points</span>`;
+    }
     randomQuote();
+}
+
+function end(){
+    updateScores();
+
+    clearInterval(timerId);
+    timerId = null; 
+
+    right = right - mistake;
+
+    if(right < 0){
+        right = 0;
+    }
+    if (mistake > letters){
+        mistake = letters;
+    }
+
+    showFeedback();
 
     timer = 0;
     isTyping = true;
-    pressed = false;
     mistake = 0;
     right = 0;
 }

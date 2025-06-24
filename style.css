@@ -9,6 +9,15 @@ body {
     margin: 0;
 }
 
+span {
+  font-size: 28px;
+  opacity: 50%;
+}
+
+.bigText {
+    font-size: 35px;
+}
+
 .container {
     width: 600px;
     text-align: center;
@@ -52,7 +61,7 @@ textarea:focus{
     font-weight: bold;
 }
 .normal{
-    color: gray;
+    color: white;
     font-weight: bold; 
 }
 
@@ -99,9 +108,9 @@ textarea:focus{
 #scoreDisplay {
     position: absolute;
     width: 400px;
-    height: 455px;
+    height: 500px;
     padding: 1em;
-    padding-top: 2em;
+    padding-top: 0.5em;
     background-color: #222222cb;
     color: #eeeeee;
     font-size: 25px;
@@ -294,4 +303,9 @@ textarea:focus{
     background-color: #888;
     color: #000000bb;
     border: 1px solid #222;
+}
+
+.feedbackText{
+    width: 450px;
+    margin-left: 2em;
 }
